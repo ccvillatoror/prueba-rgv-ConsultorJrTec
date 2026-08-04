@@ -1,0 +1,21 @@
+========== E X A M E N  D E  P R O G R A M A C I Ó N ==========
+
+Actividades:
+  Bases de Datos:
+	- Diseño
+	- Diagrama
+	- Implementación en PostgreSQL
+	- Poblar
+  Diagrama de flujo de Pagos
+  Diagrama de flujo de Gastos
+  	- Flujo de cancelación
+  	- Flujo de aprobación
+  Implementación en Python de Pagos y Gastos
+  Conectar la Base de Datos con la app.
+  Implementar la autenticación:
+  	- json con hash
+  Implementar las Tablas y gráficas de de pagos y gastos
+  Front-end
+  Desplegarla en la nube
+  Generar la API REST GET
+  
