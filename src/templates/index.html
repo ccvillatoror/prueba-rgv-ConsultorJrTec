@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gastos y Pagos de Empresa</title>
+    <link href="{{url_for('static', filename='styles/style.css')}}" rel="stylesheet" />
+</head>
+<body>
+    <h1>Gastos y Pagos</h1>
+    <h2>¿Qué desea hacer?</h2>
+    <form>
+        <button action="/gastos" type="submit">Gastos</button>
+        <button action="/pagos" type="submit">Pagos</button>
+    </form>
+</body>
+</html>
