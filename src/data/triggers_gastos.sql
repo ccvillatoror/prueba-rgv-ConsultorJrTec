@@ -14,10 +14,14 @@ BEGIN
         RAISE EXCEPTION 'El gasto % está liquidado y no puede cambiar de estado. Cree uno nuevo.', OLD.idGasto;
     END IF;
 
-    IF OLD.estado = 'Aprobado' AND NEW.estado = 'Cancelado' THEN
-        RAISE EXCEPTION 'El gasto % ya está Aprobado y no puede ser cancelado.', OLD.idGasto;
-    END IF;
+    IF OLD.estado = 'Aprobado'THEN
+        RAISE EXCEPTION 'El gasto % ya está Aprobado y no puede cambiar a %.', OLD.idGasto, NEW.estado;
+    END IF;  
 
+    IF NEW.estado = 'Liquidado' AND NEW.montoGastado != NEW.montoPagado THEN
+    -- No puede pasar a liquidado si el monto no ha sido liquidado
+        RAISE EXCEPTION 'El gasto no puede ser liquidado si no se ha pagado todo el monto';
+    END IF;
     RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
@@ -34,18 +38,18 @@ CREATE OR REPLACE FUNCTION fn_forzar_estado_inicial_gastos()
 RETURNS TRIGGER AS $$
 BEGIN
     IF NEW.estado IS DISTINCT FROM 'En proceso' THEN
-        RAISE WARNING 'El gasto será creado con estado ''En proceso'' (recibido: %).', NEW.estado;
+        RAISE WARNING 'El gasto será creado con estado ''En proceso'' (recibido: %) y monto pagado $0.00.', NEW.estado;
     END IF;
 
     NEW.estado = 'En proceso';
-
+    NEW.montoPagado = '0';
     RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
 
 -- Trigger de la función anterior, se activa al agregar un nuevo pago.
 CREATE TRIGGER trg_forzar_estado_inicial_gastos
-BEFORE INSERT ON pagos
+BEFORE INSERT ON gastos
 FOR EACH ROW
 EXECUTE FUNCTION fn_forzar_estado_inicial_gastos();
 
@@ -71,6 +75,9 @@ EXECUTE FUNCTION fn_liquidar_gastos();
 
 -- Antes de cancelar un pago, checar si no hay pagos asociados aprobados. Si hay, no se pueden cancelar. 
 -- Si no hay, cancelar sólo los pagos En proceso asociados.
+-- Esta función no tienen sentido en el modelo actual porque, para que un pago sea creado En proceso, el gasto
+-- necesita estar Aprobado y de Aprobado no se puede pasar a Cancelado.
+/*
 CREATE OR REPLACE FUNCTION fn_validar_cancelacion_gastos()
 RETURNS TRIGGER AS $$
 DECLARE
@@ -97,3 +104,4 @@ BEFORE UPDATE ON gastos
 FOR EACH ROW
 WHEN (OLD.estado IS DISTINCT FROM NEW.estado AND NEW.estado = 'Cancelado')
 EXECUTE FUNCTION fn_validar_cancelacion_gastos();
+/*

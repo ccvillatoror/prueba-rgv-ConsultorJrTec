@@ -20,11 +20,11 @@ BEGIN
     END IF;
 
     IF estadoGasto IS DISTINCT FROM 'Aprobado' THEN
-        RAISE EXCEPTION 'El gasto está % y no puede recibir pagos.', estadoGasto;
+        RAISE EXCEPTION 'El gasto está % y no puede recibir pagos. El pago no fue creado.', estadoGasto;
     END IF;
 
     IF NEW.montoPagado > montoDisponible THEN
-        RAISE EXCEPTION 'El monto del pago (%) excede el saldo del gasto (%).', 
+        RAISE EXCEPTION 'El monto del pago (%) excede el saldo del gasto (%). El pago no fue creado.', 
             NEW.montoPagado, montoDisponible;
     END IF;
 
@@ -33,7 +33,7 @@ END;
 $$ LANGUAGE plpgsql;
 
 -- Crea trigger para la función anterior, se activa para cada pago agregado
-CREATE TRIGGER trg_validar_monto_pagos
+CREATE TRIGGER trg_01_validar_monto_pagos
 BEFORE INSERT ON pagos
 FOR EACH ROW
 EXECUTE FUNCTION fn_validar_monto_pagos();
@@ -53,7 +53,7 @@ END;
 $$ LANGUAGE plpgsql;
 
 -- Trigger de la función anterior, se activa al agregar un nuevo pago.
-CREATE TRIGGER trg_forzar_estado_inicial_pagos
+CREATE TRIGGER trg_02_forzar_estado_inicial_pagos
 BEFORE INSERT ON pagos
 FOR EACH ROW
 EXECUTE FUNCTION fn_forzar_estado_inicial_pagos();
