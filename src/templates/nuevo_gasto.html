@@ -1,7 +1,7 @@
 {% extends "base.html" %} {% block title %}Registrar nuevo Gastoendblock {% endblock %} {% block content
 %} 
 
-<h1 align="center">Nuevo pago</h1>
+<h1 align="center">Nuevo gasto</h1>
 
 <form method="POST">
   <h3> Ingresa los datos para un nuevo gasto</h3>
@@ -17,7 +17,7 @@
     />
   </div>
   <div class="form-group">
-    <label for="fecha-gasto">Fecha</label>
+    <label for="fecha-gasto">Fecha (si se deja vacío, al gasto se le asignará la fecha de hoy)</label>
     <input
       type="date"
       class="form-control"
@@ -26,18 +26,6 @@
     />
   </div>
   <div class="form-group">
-    <label for="monto-gastado">Monto gastado</label>
-    <input
-      type="number"
-      class="form-control"
-      id="monto-gasto"
-      name="monto-gasto"
-      min="0.00" 
-      step="0.01" 
-      placeholder="0.00"
-      required
-    />
-  </div><div class="form-group">
     <label for="monto-gastado">Monto gastado</label>
     <input
       type="number"

@@ -6,12 +6,12 @@
 <form method="POST">
   <h3> Ingrese los datos para un nuevo pago</h3>
   <div class="form-group">
-    <label for="fecha">Fecha</label>
+    <label for="fecha-pago">Fecha (si se deja vacío, al pago se le asignará la fecha de hoy)</label>
     <input
       type="date"
       class="form-control"
-      id="fecha-gasto"
-      name="fecha-gasto"
+      id="fecha-pago"
+      name="fecha-pago"
     />
   </div>
   <div class="form-group">
@@ -24,7 +24,7 @@
     </select>
   </div>
   <div class="form-group">
-    <label for="monto-gastado">Monto gastado</label>
+    <label for="monto-gastado">Monto a pagar</label>
     <input
       type="number"
       class="form-control"
