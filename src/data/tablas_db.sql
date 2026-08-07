@@ -4,6 +4,10 @@
 
 -- Creación de tablas de la base de datos
 
+DROP TABLE IF EXISTS cuentas;
+DROP TABLE IF EXISTS gastos;
+DROP TABLE IF EXISTS pagos;
+
 CREATE TABLE cuentas(idCuenta SERIAL NOT NULL primary key, saldo decimal(11,2) NOT NULL);
 
 CREATE TABLE gastos(idGasto SERIAL NOT NULL primary key, 
