@@ -1,5 +1,7 @@
 from flask import Blueprint, render_template, request, flash
 from datetime import date 
+
+
 view_bp = Blueprint('view', __name__)
 
 @view_bp.route('/')

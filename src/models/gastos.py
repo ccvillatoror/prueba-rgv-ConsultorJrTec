@@ -1,0 +1,17 @@
+import datetime
+from db import db
+
+
+class Gastos(db.Model):
+    id = db.Column('idGasto', db.Integer, primary_key=True, nullable=False)
+    fecha = db.Column('fechaGasto', db.DateTime, nullable=False, default=datetime.date.today)
+    concepto = db.Column('concepto', db.String(100), nullable=False)
+    monto_gastado = db.Column('montoGastado', db.Float, nullable=False)
+    estado = db.Column('estado', db.String(10), nullable=False, default='En proceso')
+    monto_pagado = db.Column('montoPagado', db.Float, nullable=False, default=0.0)
+    pagos = db.relationship('Pagos')
+
+    def __init__(self, fecha, concepto, monto_gastado):
+        self.fecha = fecha
+        self.concepto = concepto
+        self.monto_gastado = monto_gastado
