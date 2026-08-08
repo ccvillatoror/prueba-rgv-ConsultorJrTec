@@ -7,6 +7,7 @@
 DROP TABLE IF EXISTS cuentas;
 DROP TABLE IF EXISTS gastos;
 DROP TABLE IF EXISTS pagos;
+DROP TABLE IF EXISTS usuarios;
 
 CREATE TABLE cuentas(idCuenta SERIAL NOT NULL primary key, saldo decimal(11,2) NOT NULL);
 
@@ -17,7 +18,7 @@ CREATE TABLE gastos(idGasto SERIAL NOT NULL primary key,
                     estado varchar(20) NOT NULL DEFAULT 'En proceso' CHECK (estado IN ('Cancelado', 'Aprobado', 'Liquidado', 'En proceso')), 
                     montoPagado decimal(10,2) NOT NULL DEFAULT '0');
 
-CREATE TABLE pagos(idPago SERIAL NOT null primary key,
+CREATE TABLE pagos(idPago SERIAL NOT NULL primary key,
                    fechaPago date NOT NULL DEFAULT CURRENT_TIMESTAMP, 
                    idGasto INT NOT NULL,
                    foreign key (idGasto) references gastos (idGasto),
@@ -26,3 +27,6 @@ CREATE TABLE pagos(idPago SERIAL NOT null primary key,
                    montoPagado decimal(10,2) NOT NULL DEFAULT '0',
                    estado varchar(20) NOT NULL DEFAULT 'En proceso' CHECK (estado IN ('Cancelado', 'Aprobado', 'En proceso')));
 
+CREATE TABLE usuarios(idUsuario SERIAL NOT NULL primary key,
+                      usuario varchar(20) NOT NULL UNIQUE,
+                      contraseña varchar(180) NOT NULL);
