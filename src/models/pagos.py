@@ -3,11 +3,12 @@ from db import db
 
 
 class Pagos(db.Model):
-    id = db.Column('idPago', db.Integer, primary_key=True, nullable=False)
-    fecha = db.Column('fechaPago', db.DateTime, nullable=False, default=datetime.date.today)
-    id_gasto = db.Column('idGasto', db.Integer, db.ForeignKey('cuentas.id'), nullable=False)
-    cuenta = db.Column('columnaAsociada', db.Integer, db.ForeignKey('cuentas.id'), nullable=False)
-    monto_pagado = db.Column('montoPagado', db.Float, nullable=False)
+    __tablename__ = 'pagos'
+    id = db.Column('idpago', db.Integer, primary_key=True, nullable=False)
+    fecha = db.Column('fechapago', db.DateTime, nullable=False, default=datetime.date.today)
+    id_gasto = db.Column('idgasto', db.Integer, db.ForeignKey('gastos.idgasto'), nullable=False)
+    cuenta = db.Column('cuentaasociada', db.Integer, db.ForeignKey('cuentas.idcuenta'), nullable=False)
+    monto_pagado = db.Column('montopagado', db.Float, nullable=False)
     estado = db.Column('estado', db.String(10), nullable=False, default='En proceso')
 
     def __init__(self, fecha, id_gasto, cuenta, monto_pagado):

@@ -1,4 +1,9 @@
-from flask import Blueprint, render_template, request, flash
+from db import db
+
+from flask import Blueprint, render_template, request, flash, redirect, url_for
+from flask_login import login_user, login_required, logout_user, current_user
+from models.usuarios import Usuarios
+from werkzeug.security import check_password_hash
 
 auth_bp = Blueprint('auth', __name__)
 
@@ -8,17 +13,22 @@ def login():
         usr = request.form.get('user')
         pwd = request.form.get('password')
 
-        if len(usr) < 3:
-            flash('Introduzca un usario válido.', category='error')
-        elif len(pwd) < 3:
-            flash('Introduzca una contraseña válida.', category='error')
+        usuario = Usuarios.query.filter_by(usuario=usr).first()
+        if usuario:
+            if check_password_hash(usuario.contraseña, pwd):
+                flash('Ha ingresado correctamente', category='success')
+                login_user(usuario, remember=True)
+                return redirect(url_for('views.home'))
+            else:
+                flash('Contraseña incorrecta, vuelva a intentarlo', category='error')
         else:
-            flash('¡Bienvenido/a!', category='success')
-
+            flash('El usuario no existe', category='error')
             
-    return render_template('login.html')
+    return render_template('login.html', user=current_user)
 
 @auth_bp.route('/logout')
+@login_required
 def logout():
-    return "<p>Logout</o>"
+    logout_user()
+    return redirect(url_for('auth.login'))
 

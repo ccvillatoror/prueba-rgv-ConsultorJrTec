@@ -1,22 +1,24 @@
 import os
-
-from flask import Flask
-from waitress import serve
-
-from dotenv import load_dotenv
+from auth import auth_bp
 from db import db
-
-
-load_dotenv()
+from dotenv import load_dotenv
+from flask import Flask
+from flask_login import LoginManager
+from models.cuentas import Cuentas
+from models.gastos import Gastos
+from models.usuarios import Usuarios
+from models.pagos import Pagos
+from views import view_bp
+from waitress import serve
 
 
 def create_app():
+
+    load_dotenv()
+
     app = Flask(__name__)
     app.config['SECRET_KEY'] = os.environ['APP_SECRET_KEY']
-
-    from views import view_bp
-    from auth import auth_bp
-
+    
     app.register_blueprint(auth_bp, url_prefix='/')
     app.register_blueprint(view_bp, url_prefix='/')
 
@@ -35,6 +37,20 @@ def create_app():
 
     db.init_app(app)
 
+    # Login
+    login_manager = LoginManager()
+    login_manager.login_view = 'auth.login'
+    login_manager.login_message = "Necesitas iniciar sesión primero."
+    login_manager.login_message_category = "warning"
+    login_manager.init_app(app)
+
+    app.config['LOGIN_DISABLED'] = False
+    app.config['TESTING'] = False   
+    
+    @login_manager.user_loader
+    def load_user(id):
+        return db.session.get(Usuarios, int(1))
+        
     return app
 
 application = create_app()
