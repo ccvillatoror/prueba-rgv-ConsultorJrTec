@@ -104,7 +104,7 @@
 {{ super() }}
 <script type="text/javascript">
   function aprobarGasto(gasto_id) {
-    const confirmado = window.confirm("Seleccione aceptar para aprobar este gasto");
+    const confirmado = window.confirm("Seleccione aceptar para aprobar este gasto \nEsta acción no se puede deshacer.");
 
     if (!confirmado) {
       window.location.href = "/gastos";
@@ -130,7 +130,7 @@
 
 
   function cancelarGasto(gasto_id) {
-    const confirmado = window.confirm("¿Estás seguro de que quieres cancelar este gasto?");
+    const confirmado = window.confirm("¿Estás seguro de que quieres cancelar este gasto? \nEsta acción no se puede deshacer.");
 
     if (!confirmado) {
       window.location.href = "/gastos";
