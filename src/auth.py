@@ -13,7 +13,10 @@ def login():
         usr = request.form.get('user')
         pwd = request.form.get('password')
 
-        usuario = Usuarios.query.filter_by(usuario=usr).first()
+        usuario = db.session.execute(
+            db.select(Usuarios).filter_by(usuario=usr)
+            ).scalar_one_or_none()
+        
         if usuario:
             if check_password_hash(usuario.contraseña, pwd):
                 flash('Ha ingresado correctamente', category='success')
