@@ -1,2 +1,151 @@
 {% extends "base.html" %} {% block title %} Gastos {% endblock %} {% block content
-%} <h1>Aquí se muestran todos los gastos</h1>{% endblock %}
+%} 
+
+<style>
+  .tabla-gastos-wrapper {
+    max-height: 480px;
+    overflow-y: auto;
+    border: 1px solid #dee2e6;
+    border-radius: 6px;
+  }
+
+  .tabla-gastos thead th {
+    position: sticky;
+    top: 0;
+    background: #f8f9fa;
+    z-index: 1;
+  }
+
+  .tabla-gastos td, .tabla-gastos th {
+    vertical-align: middle;
+    white-space: nowrap;
+  }
+
+  .tabla-gastos .acciones {
+    display: flex;
+    gap: 6px;
+  }
+
+  .tabla-gastos .sin-acciones {
+    color: #adb5bd;
+  }
+</style>
+
+
+<div class="d-flex justify-content-between align-items-center mt-4 mb-3">
+  <h1 class="m-0">Todos los gastos</h1>
+</div>
+
+<div class="card">
+  <div class="tabla-pagos-wrapper">
+    <table class="table table-hover tabla-gastos m-0">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Fecha</th>
+          <th>Concepto</th>
+          <th>Monto gastado</th>
+          <th>Monto pagado</th>
+          <th>Estado</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody id="tabla-gastos-body">
+        {% for gasto in gastos %}
+        <tr id="fila-{{ gasto.id }}">
+          <td>{{ gasto.id }}</td>
+          <td>{{ gasto.fecha }}</td>
+          <td>{{ gasto.concepto }}</td>
+          <td>${{ "%.2f"|format(gasto.monto_gastado) }}</td>
+          <td>${{ "%.2f"|format(gasto.monto_pagado) }}</td>
+          <td>
+            {% if gasto.estado == "En proceso" %}
+              <span class="badge badge-warning">{{ gasto.estado }}</span>
+            {% elif gasto.estado == "Aprobado" %}
+              <span class="badge badge-primary">{{ gasto.estado }}</span>
+            {% elif gasto.estado == "Liquidado" %}
+              <span class="badge badge-success">{{ gasto.estado }}</span>
+            {% elif gasto.estado == "Cancelado" %}
+              <span class="badge badge-danger">{{ gasto.estado }}</span>
+            {% else %}
+              <span class="badge badge-secondary">{{ gasto.estado }}</span>
+            {% endif %}
+          </td>
+          <td>
+            {% if gasto.estado == "En proceso" %}
+              <div class="acciones">
+                <button class="btn btn-sm btn-primary" onclick="aprobarGasto({{ gasto.id }})">Aprobado</button>
+                <button class="btn btn-sm btn-outline-danger" onclick="cancelarGasto({{ gasto.id }})">Cancelar</button>
+              </div>
+            {% elif gasto.estado == "Aprobado" %}
+              <div class="acciones">
+                <button class="btn btn-sm btn-success" onclick="pagarGasto({{ gasto.id }})">Pagar</button>
+              </div>
+            {% else %}
+              <span class="sin-acciones">—</span>
+            {% endif %}
+          </td>
+        </tr>
+        {% else %}
+        <tr>
+          <td colspan="7" class="text-center text-muted py-4">No hay gastos para mostrar.</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}
+
+{% block javascript %}
+{{ super() }}
+<script type="text/javascript">
+  function aprobarGasto(gasto_id) {
+    const confirmado = window.confirm("Seleccione aceptar para aprobar este gasto");
+
+    if (!confirmado) {
+      window.location.href = "/gastos";
+      return;
+    }
+
+    fetch("/aprobar-gasto", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ gasto_id: gasto_id }),
+    })
+      .then((res) => {
+        if (!res.ok) throw new Error("Error al aprobar el gasto");
+        window.location.href = "/gastos";
+      })
+      .catch((err) => console.error(err));
+  }
+
+  
+   function pagarGasto(gasto_id) {
+    window.location.href = "/pagar-gasto/" + gasto_id;
+  }
+
+
+  function cancelarGasto(gasto_id) {
+    const confirmado = window.confirm("¿Estás seguro de que quieres cancelar este gasto?");
+
+    if (!confirmado) {
+      window.location.href = "/gastos";
+      return;
+    }
+
+    fetch("/cancelar-gasto", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ gasto_id: gasto_id }),
+    })
+      .then((res) => {
+        if (!res.ok) throw new Error("Error al cancelar el gasto");
+        window.location.href = "/gastos";
+      })
+      .catch((err) => console.error(err));
+  }
+</script>
+
+
+{% endblock %}

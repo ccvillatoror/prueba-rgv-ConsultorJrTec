@@ -2,7 +2,7 @@
 %} 
 
 <h1 align="center">Nuevo Pago</h1>
-
+ 
 <form method="POST">
   <h3> Ingrese los datos para un nuevo pago</h3>
   <div class="form-group">
@@ -17,10 +17,11 @@
   <div class="form-group">
     <label for="gasto-relacionado">Número de gasto relacionado</label>
     <select id="gasto-relacionado" name="gasto-relacionado">
-        <option value="1">1</option>
-        <option value="2">2</option>
-        <option value="3">3</option>
-        <option value="4">4</option>
+        {% for gasto in gastos_aprobados %}
+        <option value="{{ gasto.id }}" {% if gasto.id == gasto_seleccionado %}selected{% endif %} >{{ gasto.id }} - {{ gasto.concepto }}</option>
+        {% else %}
+        <option value="" disabled selected>No hay gastos aprobados</option>
+        {% endfor %}
     </select>
   </div>
   <div class="form-group">
@@ -39,11 +40,15 @@
   <div class="form-group">
     <label for="cuenta-asociada">Cuenta de origen</label>
     <select id="cuenta-asociada" name="cuenta-asociada">
-        <option value="1">1</option>
-        <option value="2">2</option>
+        {% for cuenta in cuentas %}
+        <option value="{{ cuenta.id }}">Cuenta {{ cuenta.id }} - Saldo: ${{ "%.2f"|format(cuenta.saldo) }}</option>
+        {% else %}
+        <option value="" disabled selected>No hay cuentas disponibles</option>
+        {% endfor %}
     </select>
   </div>
   <br />
   <button type="submit" class="btn btn-primary">Guardar pago</button>
 </form>
+
 {% endblock %}
