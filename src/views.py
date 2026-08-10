@@ -134,7 +134,10 @@ def cancelar_gasto():
 @view_bp.route('/pagos')
 @login_required
 def pagos():
-    return render_template('ver_pagos.html', user=current_user)
+    todos_pagos = db.session.execute(
+        db.select(Pagos).order_by(Pagos.id)
+    ).scalars().all()
+    return render_template('ver_pagos.html', user=current_user, pagos=todos_pagos)
 
 @view_bp.route('/pagos/nuevo/', methods=['GET', 'POST'])
 @view_bp.route('/pagos/nuevo', methods=['GET', 'POST'])
@@ -181,3 +184,59 @@ def nuevo_pago():
 
 
     return render_template('nuevo_pago.html', user=current_user, gastos_aprobados=gastos_aprobados, cuentas=cuentas, gasto_seleccionado=gasto_seleccionado)
+
+@view_bp.route('/aprobar-pago', methods=['POST'])
+@login_required
+def aprobar_pago():
+    data = request.get_json()
+    pago_id = data.get('pago_id')
+
+    pago_bd = db.session.get(Pagos, pago_id)
+
+    if not pago_bd:
+        flash('Artículo no econtroado', category='error')
+        return jsonify({'error': 'Artículo no encontrado'}), 404
+    try: 
+        db.session.execute(
+            update(Pagos)
+            .where(Pagos.id == pago_id)
+            .values(estado='Aprobado')
+            )
+
+        db.session.commit()
+
+    except InternalError as e:
+        descripción_error = str(e.orig).split('CONTEXT')[0]
+        flash(descripción_error, category='error')
+        db.session.rollback()
+        return jsonify({'error': descripción_error}), 404
+
+    return jsonify({'success': True})
+
+@view_bp.route('/cancelar-pago', methods=['POST'])
+@login_required
+def cancelar_pago():
+    data = request.get_json(force=True)
+    pago_id = data.get('pago_id')
+
+    pago_bd = db.session.get(Pagos, pago_id)
+
+    if not pago_bd:
+        flash('Artículo no encontrado', category='error')
+        return jsonify({'error': 'Artículo no encontrado'}), 404
+    try:
+        db.session.execute(
+            update(Pagos)
+            .where(Pagos.id == pago_id)
+            .values(estado='Cancelado')
+            )
+
+        db.session.commit()
+
+    except InternalError as e:
+        descripción_error = str(e.orig).split('CONTEXT')[0]
+        flash(descripción_error, category='error')
+        db.session.rollback()
+        return jsonify({'error': descripción_error}), 404
+
+    return jsonify({'success': True})

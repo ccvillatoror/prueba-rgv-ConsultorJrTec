@@ -1,2 +1,140 @@
 {% extends "base.html" %} {% block title %}Pagos{% endblock %} {% block content
-%} <h1>Aquí se listan todos los pagos</h1>{% endblock %}
+%} 
+
+<style>
+  .tabla-pagos-wrapper {
+    max-height: 480px;
+    overflow-y: auto;
+    border: 1px solid #dee2e6;
+    border-radius: 6px;
+  }
+
+  .tabla-pagos thead th {
+    position: sticky;
+    top: 0;
+    background: #f8f9fa;
+    z-index: 1;
+  }
+
+  .tabla-pagos td, .tabla-pagos th {
+    vertical-align: middle;
+    white-space: nowrap;
+  }
+
+  .tabla-pagos .acciones {
+    display: flex;
+    gap: 6px;
+  }
+
+  .tabla-pagos .sin-acciones {
+    color: #adb5bd;
+  }
+</style>
+
+<div class="mt-4 mb-3">
+  <h1 class="text-center">Todos los Pagos</h1>
+  <div class="d-flex justify-content-end">
+    <a href="/pagos/nuevo" class="btn btn-primary">Nuevo pago</a>
+  </div>
+</div>
+
+<div class="card">
+  <div class="tabla-pagos-wrapper">
+    <table class="table table-hover tabla-pagos m-0">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Fecha</th>
+          <th>Gasto relacionado</th>
+          <th>Cuenta</th>
+          <th>Monto pagado</th>
+          <th>Estado</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody id="tabla-pagos-body">
+        {% for pago in pagos %}
+        <tr id="fila-{{ pago.id }}">
+          <td>{{ pago.id }}</td>
+          <td>{{ pago.fecha }}</td>
+          <td>{{ pago.id_gasto }}</td>
+          <td>{{ pago.cuenta }}</td>
+          <td>${{ "%.2f"|format(pago.monto_pagado) }}</td>
+          <td>
+            {% if pago.estado == "En proceso" %}
+              <span class="badge badge-warning">{{ pago.estado }}</span>
+            {% elif pago.estado == "Aprobado" %}
+              <span class="badge badge-primary">{{ pago.estado }}</span>
+            {% elif pago.estado == "Cancelado" %}
+              <span class="badge badge-danger">{{ pago.estado }}</span>
+            {% else %}
+              <span class="badge badge-secondary">{{ pago.estado }}</span>
+            {% endif %}
+          </td>
+          <td>
+            {% if pago.estado == "En proceso" %}
+              <div class="acciones">
+                <button class="btn btn-sm btn-primary" onclick="aprobarPago({{ pago.id }})">Aprobado</button>
+                <button class="btn btn-sm btn-outline-danger" onclick="cancelarPago({{ pago.id }})">Cancelar</button>
+              </div>
+            {% else %}
+              <span class="sin-acciones">—</span>
+            {% endif %}
+          </td>
+        </tr>
+        {% else %}
+        <tr>
+          <td colspan="7" class="text-center text-muted py-4">No hay pagos para mostrar.</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}
+
+{% block javascript %}
+{{ super() }}
+<script type="text/javascript">
+  function aprobarPago(pago_id) {
+    const confirmado = window.confirm("¿Seguro que quiere aprobar el pago? \nEsta acción no se puede deshacer.");
+
+    if (!confirmado) {
+      window.location.href = "/pagos";
+      return;
+    }
+
+    fetch("/aprobar-pago", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ pago_id: pago_id }),
+    })
+      .then((res) => {
+        if (!res.ok) throw new Error("Error al aprobar el pago");
+        window.location.href = "/pagos";
+      })
+      .catch((err) => console.error(err));
+  }
+
+
+  function cancelarPago(pago_id) {
+    const confirmado = window.confirm("¿Estás seguro de que quieres cancelar este pago? \nEsta acción no se puede deshacer.");
+
+    if (!confirmado) {
+      window.location.href = "/pagos";
+      return;
+    }
+
+    fetch("/cancelar-pago", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ pago_id: pago_id }),
+    })
+      .then((res) => {
+        if (!res.ok) throw new Error("Error al cancelar el pago");
+        window.location.href = "/pagos";
+      })
+      .catch((err) => console.error(err));
+  }
+</script>
+{% endblock %}
