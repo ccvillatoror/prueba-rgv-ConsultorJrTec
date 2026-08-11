@@ -9,7 +9,6 @@ from models.gastos import Gastos
 from models.usuarios import Usuarios
 from models.pagos import Pagos
 from views import view_bp
-from waitress import serve
 
 
 def create_app():
@@ -33,7 +32,6 @@ def create_app():
     postgres_url = f"postgresql://{usr}:{pwd}@{host}:{port}/{db_name}?options=-csearch_path%3D{schema_name}"
     
     app.config['SQLALCHEMY_DATABASE_URI'] = postgres_url
-    app.config['SQLALCHEMY_ENGINES'] = {'default': postgres_url}
 
     db.init_app(app)
 
@@ -49,11 +47,11 @@ def create_app():
     
     @login_manager.user_loader
     def load_user(id):
-        return db.session.get(Usuarios, int(1))
+        return db.session.get(Usuarios, int(id))
         
     return app
 
 application = create_app()
 
 if __name__=="__main__":
-    serve(application, host='0.0.0.0', port=8000)
+    application.run(debug=True, host='0.0.0.0', port=8000)
