@@ -11,6 +11,17 @@ class Gastos(db.Model):
     monto_pagado = db.Column('montopagado', db.Float, nullable=False, default=0.0)
     pagos = db.relationship('Pagos', backref='gasto', lazy=True)
 
+    def to_dict(self):
+            return {
+                'id': self.id,
+                'fecha': self.fecha,
+                'concepto': self.concepto,
+                'monto_gastado': self.monto_gastado,
+                'monto_pagado': self.monto_pagado,
+                'saldo_pendiente': round(self.monto_gastado - self.monto_pagado, 2),
+                'estado': self.estado,
+            }
+
     def __init__(self, fecha, concepto, monto_gastado):
         self.fecha = fecha
         self.concepto = concepto

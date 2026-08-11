@@ -5,6 +5,11 @@ class Cuentas(db.Model):
     saldo = db.Column('saldo', db.Float, nullable=False)
     pagos = db.relationship('Pagos')
 
+    def to_dict(self):
+            return {
+                'id': self.id,
+                'saldo': self.saldo,
+            }
 
     def __init__(self, saldo):
             self.saldo = saldo

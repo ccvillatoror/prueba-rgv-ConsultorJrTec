@@ -11,6 +11,16 @@ class Pagos(db.Model):
     monto_pagado = db.Column('montopagado', db.Float, nullable=False)
     estado = db.Column('estado', db.String(10), nullable=False, default='En proceso')
 
+    def to_dict(self):
+        return {
+             'id': self.id,
+             'fecha': self.fecha,
+             'id_gasto': self.id_gasto,
+             'cuenta': self.cuenta,
+             'monto_pagado': self.monto_pagado,
+             'estado': self.estado             
+             }
+    
     def __init__(self, fecha, id_gasto, cuenta, monto_pagado):
             self.fecha = fecha
             self.id_gasto = id_gasto
