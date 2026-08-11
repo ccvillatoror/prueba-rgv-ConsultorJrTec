@@ -1,9 +1,11 @@
 import os
+from api import api_bp
 from auth import auth_bp
 from db import db
 from dotenv import load_dotenv
 from flask import Flask
 from flask_login import LoginManager
+from flask_jwt_extended import JWTManager
 from models.cuentas import Cuentas
 from models.gastos import Gastos
 from models.usuarios import Usuarios
@@ -17,9 +19,11 @@ def create_app():
 
     app = Flask(__name__)
     app.config['SECRET_KEY'] = os.environ['APP_SECRET_KEY']
+    app.config['JWT_SECRET_KEY'] = os.environ['JWT_SECRET_KEY']
     
     app.register_blueprint(auth_bp, url_prefix='/')
     app.register_blueprint(view_bp, url_prefix='/')
+    app.register_blueprint(api_bp, url_prefix='/api')
 
     # Base de datos
     usr = os.getenv("PSQL_USR")
@@ -35,8 +39,9 @@ def create_app():
 
     db.init_app(app)
 
-    # Login
+    # Login y JWT
     login_manager = LoginManager()
+    jwt = JWTManager(app)
     login_manager.login_view = 'auth.login'
     login_manager.login_message = "Necesitas iniciar sesión primero."
     login_manager.login_message_category = "warning"
