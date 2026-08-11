@@ -5,8 +5,8 @@ from flask_login import login_required, current_user
 from models.cuentas import Cuentas
 from models.gastos import Gastos
 from models.pagos import Pagos
-from sqlalchemy import update
-from sqlalchemy.exc import InternalError
+from sqlalchemy import update, text
+from sqlalchemy.exc import InternalError, IntegrityError
 
 view_bp = Blueprint('views', __name__)
 
@@ -49,6 +49,10 @@ def nuevo_gasto():
             except InternalError as e:
                 flash(str(e.orig).split('CONTEXT')[0], category='error')
                 db.session.rollback()
+                return render_template('nuevo_gasto.html', user=current_user)
+            except IntegrityError as e:
+                db.session.rollback()
+                flash(f'Ha sucedido un error inesperado. Intente más tarde. \nCódigo: {e.orig.pgcode}', category='error')
                 return render_template('nuevo_gasto.html', user=current_user)
 
 
@@ -176,7 +180,11 @@ def nuevo_pago():
                 flash(str(e.orig).split('CONTEXT')[0], category='error')
                 db.session.rollback()
                 return render_template('nuevo_pago.html', user=current_user, gastos_aprobados=gastos_aprobados, cuentas=cuentas, gasto_seleccionado=gasto_seleccionado)
-        
+            except IntegrityError as e:
+                db.session.rollback()
+                flash(f'Ha sucedido un error inesperado. Intente más tarde. \nCódigo: {e.orig.pgcode}', category='error')
+                return render_template('nuevo_pago.html', user=current_user, gastos_aprobados=gastos_aprobados, cuentas=cuentas, gasto_seleccionado=gasto_seleccionado)
+            
             flash(f'El pago fue guardado con fecha {es_hoy}{fecha}.', category='success')
             flash('Para que el pago sea aplicado debe ser aprobado.', category='warning')
             return redirect(url_for('views.pagos'))
