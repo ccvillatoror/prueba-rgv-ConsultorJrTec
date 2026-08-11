@@ -104,4 +104,4 @@ BEFORE UPDATE ON gastos
 FOR EACH ROW
 WHEN (OLD.estado IS DISTINCT FROM NEW.estado AND NEW.estado = 'Cancelado')
 EXECUTE FUNCTION fn_validar_cancelacion_gastos();
-/*
+*/
