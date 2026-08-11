@@ -4,10 +4,13 @@
 
 
 -- Al agregar un nuevo pago, verifica que el monto a pagar sea menor al monto que queda por pagar del gasto asociado.
+-- Se resta tanto lo ya pagado (Aprobado) como lo que ya está pendiente de aprobar (En proceso),
+-- para evitar que dos pagos pendientes en conjunto excedan el monto del gasto.
 CREATE OR REPLACE FUNCTION fn_validar_monto_pagos()
 RETURNS TRIGGER AS $$
 DECLARE 
     montoDisponible decimal(10,2);
+    montoEnProceso decimal(10,2);
     estadoGasto varchar(20);
 BEGIN
     SELECT gastos.montoGastado - gastos.montoPagado, gastos.estado
@@ -23,8 +26,16 @@ BEGIN
         RAISE EXCEPTION 'El gasto está % y no puede recibir pagos. El pago no fue creado.', estadoGasto;
     END IF;
 
+    SELECT COALESCE(SUM(montoPagado), 0)
+    INTO montoEnProceso
+    FROM pagos
+    WHERE idGasto = NEW.idGasto
+      AND estado = 'En proceso';
+
+    montoDisponible = montoDisponible - montoEnProceso;
+
     IF NEW.montoPagado > montoDisponible THEN
-        RAISE EXCEPTION 'El monto del pago (%) excede el saldo del gasto (%). El pago no fue creado.', 
+        RAISE EXCEPTION 'El monto del pago (%) excede el saldo disponible del gasto (%), considerando pagos pendientes de aprobar. Apruebe o cancele algunos y vuelva a intentarlo. El pago no fue creado.', 
             NEW.montoPagado, montoDisponible;
     END IF;
 
@@ -37,6 +48,35 @@ CREATE TRIGGER trg_01_validar_monto_pagos
 BEFORE INSERT ON pagos
 FOR EACH ROW
 EXECUTE FUNCTION fn_validar_monto_pagos();
+
+-- Al agregar un nuevo pago, verifica que no exista ya otro pago 'En proceso' al mismo
+-- gasto y por el mismo monto exacto. Evita duplicados por doble clic o reintentos.
+CREATE OR REPLACE FUNCTION fn_no_pagos_duplicados()
+RETURNS TRIGGER AS $$
+DECLARE
+    idPagoExistente INTEGER;
+BEGIN
+    SELECT idPago INTO idPagoExistente
+    FROM pagos
+    WHERE idGasto = NEW.idGasto
+      AND montoPagado = NEW.montoPagado
+      AND estado = 'En proceso'
+    LIMIT 1;
+
+    IF FOUND THEN
+        RAISE EXCEPTION 'Ya existe un pago pendiente (id %) al gasto % por $%. Apruebe o cancele el anterior antes de crear uno nuevo.',
+            idPagoExistente, NEW.idGasto, NEW.montoPagado;
+    END IF;
+
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Crea trigger para la función anterior, se activa para cada pago agregado
+CREATE TRIGGER trg_03_no_pagos_duplicados
+BEFORE INSERT ON pagos
+FOR EACH ROW
+EXECUTE FUNCTION fn_no_pagos_duplicados();
 
 -- Función para que todos los pagos inicialmente agregados sean siempre en estado 'En proceso'
 CREATE OR REPLACE FUNCTION fn_forzar_estado_inicial_pagos()
