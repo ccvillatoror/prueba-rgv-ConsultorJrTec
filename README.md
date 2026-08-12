@@ -6,6 +6,48 @@ Este repositorio para subir el código y el material del desarrollo de la Prueba
 El archivo principal del proyecto es `src/application.py`.
 
 ## Proceso de diseño
+### ¿Cómo acceder a la aplicación?
+Para consultar la aplicación en línea, use el siguiente link: [prueba-rgv-consultorjrtec.onrender.com/login](prueba-rgv-consultorjrtec.onrender.com/login) (Consultado el 11 de agosto).
+
+Puede usar las siguientes **credenciales:**
+- **Usuario:**
+- **Contraseña:**
+
+Después de iniciar sesión, el usuario tiene dos posibles caminos: Pagos y Gastos.
+
+### Diagramas de los Gastos
+Un Gasto puede estar "En proceso", "Aprobado", "Cancelado" y "Liquidado". El siguiente diagrama muestra cómo se puede pasar entre los estados, de "En proceso" se puede cancelar o aprobar y de "Aprobado" se puede pasar a "Liquidado" sólo si el monto gastado se cubre por completo con pagos. Una vez cancelado un gasto, no se puede revertir.
+
+![Diagrama del flujo entre estados](/proceso/img/Flujos-Gastos-estados.jpg)
+
+El flujo del programa se ilustra en el siguiente diagrama.
+
+![Diagrama del proceso de Gastos](/proceso/img/Flujos-Gastos-todo.jpg)
+
+### Diagramas de los Pagos
+Un Gasto puede estar "En proceso", "Aprobado" y "Cancelado". El siguiente diagrama muestra cómo se puede pasar entre los estados, de "En proceso" se puede cancelar o aprobar y pero de "Aprobado" no se puede cancelar, ni revertir el estado de "Cancelado".
+
+![Diagrama del flujo entre estados](/proceso/img/Flujos-Pagos-estados.jpg)
+
+El flujo del programa con respecto a los pagosx se ilustra en el siguiente diagrama.
+
+![Diagrama del proceso de Gastos](/proceso/img/Flujos-Pagos-todo.jpg)
+
+### Video del funcionamiento del proyecto
+En este video se puede ver todas las funciones del programa en funcionamiento.
+
+[Vídeo de página web](https://drive.google.com/)
+
+En este video se ve un demo de las consultas que se pueden hacer a la API.
+
+[Vídeo de demo API](https://drive.google.com/)
+
+
+### Diagrama de la base de datos
+La base de datos cuenta con cuatro tablas: Cuentas, Gastos, Pagos y Usuarios. Contiene lo mínimo para resolver este reto.
+
+
+![Diagrama de la base de datos](/proceso/img/DiagramaBD.jpg)
 
 ## Documentación de la API
 
@@ -50,7 +92,7 @@ Devuelve una lista de las funciones disponibles de la api.
 - **Requiere autenticación:** Sí (JWT)
 - **Ejemplos con cURL:**
 ```
-curl "http://localhost:8000/api/" \
+curl https://prueba-rgv-consultorjrtec.onrender.com/api/ \
      -H "Authorization: Bearer TU_TOKEN_JWT"
 ```
 - **Respuesta Exitosa (Código 200 OK):**
@@ -84,10 +126,10 @@ Devuelve una lista de todos los gastos registrados en la base de datos. Permite 
     - `estado` (opcional): Los valores permitidos son `En proceso`, `Aprobado`, `Liquidado`, `Cancelado`
 - **Ejemplos con cURL:**
 ```
-curl "http://localhost:8000/api/gastos?estado=En%20proceso" \
+curl https://prueba-rgv-consultorjrtec.onrender.com/api/gastos?estado=En%20proceso \
      -H "Authorization: Bearer TU_TOKEN_JWT"
 
-curl "http://localhost:8000/api/gastos?estado=Aprobado" \
+curl https://prueba-rgv-consultorjrtec.onrender.com/api/gastos?estado=Aprobado \
      -H "Authorization: Bearer TU_TOKEN_JWT"
 
 ```
@@ -124,7 +166,7 @@ Devuelve la información detallada de un único gasto.
 - **Requiere autenticación:** Sí (JWT)`
 - **Ejemplo con cURL:**
 ```
-curl "http://localhost:8000/api/gastos/1 \
+curl https://prueba-rgv-consultorjrtec.onrender.com/api/gastos/1 \
      -H "Authorization: Bearer TU_TOKEN_JWT"
 
 ```
@@ -164,10 +206,10 @@ Devuelve una lista de todos los pagos registrados en la base de datos. Permite f
     - `id_gasto` (opcional): Un entero.
 - **Ejemplos con cURL:**
 ```
-curl "http://localhost:8000/api/pagos?estado=Cancelado" \
+curl https://prueba-rgv-consultorjrtec.onrender.com/api/pagos?estado=Cancelado \
      -H "Authorization: Bearer TU_TOKEN_JWT"
 
-curl "http://localhost:8000/api/pagos?id_gasto=4" \
+curl https://prueba-rgv-consultorjrtec.onrender.com/api/pagos?id_gasto=4 \
      -H "Authorization: Bearer TU_TOKEN_JWT"
 
 ```
@@ -210,7 +252,7 @@ Devuelve la información detallada de un único pago.
 - **Requiere autenticación:** Sí (JWT)`
 - **Ejemplo con cURL:**
 ```
-curl "http://localhost:8000/api/pagos/1 \
+curl https://prueba-rgv-consultorjrtec.onrender.com/api/pagos/1 \
      -H "Authorization: Bearer TU_TOKEN_JWT"
 
 ```
@@ -246,7 +288,7 @@ Devuelve una lista de todas las cuentas registradas en la base de datos. Permite
 - **Requiere autenticación:** Sí (JWT)
 - **Ejemplo con cURL:**
 ```
-curl "http://localhost:8000/api/cuentas \
+curl https://prueba-rgv-consultorjrtec.onrender.com/api/cuentas \
      -H "Authorization: Bearer TU_TOKEN_JWT"
 ```
 Donde `TU_TOKEN_JWT` es el token dado en la respuesta del `login`.
@@ -272,7 +314,7 @@ Devuelve la información detallada de una única cuenta.
 - **Requiere autenticación:** Sí (JWT)`
 - **Ejemplo con cURL:**
 ```
-curl "http://localhost:8000/api/cuentas/2 \
+curl https://prueba-rgv-consultorjrtec.onrender.com/api/cuentas/2 \
      -H "Authorization: Bearer TU_TOKEN_JWT"
 
 ```
@@ -305,3 +347,14 @@ La API utiliza los códigos de estado HTTP estándar para indicar el éxito o fr
 | `401 Unauthorized` | No Autorizado | No enviaste el token JWT, expiró o está mal escrito. |
 | `404 Not Found` | No Encontrado | El recurso o la URL que buscas no existe. |
 | `500 Internal Error` | Error del Servidor | Hubo un problema interno en el código de la aplicación. |
+
+## Futuras mejoras
+En la página de ver los gastos agregar una columna para el monto que falta por pagar, restando el monto gastado menos el monto pagado.
+
+En la página de ver los pagos agregar el concepto del gasto además de su id.
+
+El objetivo era hostear la aplicación usando AWS Elastic Beanstalk, pero por un error del .zip no pude. Lo seguiré intentando.
+
+Se le puede agregar una página para ver las cuentas y los pagos realizados con esa cuenta.
+
+La página no tiene para agregar usuarios, se puede implementar. Dependiendo de los objetivos, se puede hasta tener un sistema de permisos asociados a un usuario.
