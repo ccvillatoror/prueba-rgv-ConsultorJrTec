@@ -349,6 +349,13 @@ La API utiliza los códigos de estado HTTP estándar para indicar el éxito o fr
 | `500 Internal Error` | Error del Servidor | Hubo un problema interno en el código de la aplicación. |
 
 ## Futuras mejoras
+Lo más importante, no terminé las gráficas. Idealmente estarán en el inicio y pensaba hacerlas con `matplotlib`. Algunas gráficas quisiera hacerle:
+
+- Monto gastado vs Monto pagado.
+- Gastos y Pagos por mes.
+- Saldo por cuenta.
+- Gastos y Pagos por estado.
+
 En la página de ver los gastos agregar una columna para el monto que falta por pagar, restando el monto gastado menos el monto pagado.
 
 En la página de ver los pagos agregar el concepto del gasto además de su id.
